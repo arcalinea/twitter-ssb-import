@@ -42,14 +42,12 @@ ssbClient(
             
             if(!twitterConfig.dry_run){
                 console.log("Publishing tweets to ssb...");
-                index = Object.keys(tweets)[Object.keys(tweets).length-1];
-                while (index > -1){
-                    if (tweets[index]) {
-                        sbot.publish({type: "post", text: tweets[index]['text']}, function (err, msg) {
-                            if (err) throw err
-                            console.log("Published: ", msg)
-                        })
-                    }
+                for (i = 0; i < tweets.length; ++i) {
+                    console.log(tweets[i]['text'])
+                    sbot.publish({type: "post", text: tweets[i]['text']}, function (err, msg) {
+                        if (err) throw err
+                        console.log("Published: ", msg)
+                    })
                     index -= 1;
                 }
             } else {
@@ -172,4 +170,17 @@ function previewTweets(tweets){
     } else {
         process.exit( 1 );
     }
+}
+
+function orderTweetsByTime(tweets){
+    var ordered = [];
+    for (var index in tweets) {
+        ordered.push(tweets[index]);
+    }
+    console.log("Unordered", ordered)
+    ordered.sort(function(a, b) {
+        return Date.parse(a.created_at) - Date.parse(b.created_at);
+    });
+    console.log("Ordered", ordered)
+    return ordered;
 }
