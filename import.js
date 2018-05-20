@@ -42,11 +42,15 @@ ssbClient(
             var tweets = previewTweets(tweetsToBeAdded);
             if(!twitterConfig.dry_run){
                 console.log("Publishing tweets to ssb...");
-                for (k in tweets){
-                    sbot.publish({type: "post", text: tweets[k]['text']}, function (err, msg) {
-                        if (err) throw err
-                        console.log("Published: ", tweets[k]['text'])
-                    })
+                index = Object.keys(tweets)[Object.keys(tweets).length-1];
+                while (index > -1){
+                    if (tweets[index]) {
+                        sbot.publish({type: "post", text: tweets[index]['text']}, function (err, msg) {
+                            if (err) throw err
+                            console.log("Published: ", msg)
+                        })
+                    }
+                    index -= 1;
                 }
             } else {
                 console.log("Finished preview. To add tweets to ssb, change 'dry_run' field in config.js to 'false'.")
@@ -65,12 +69,15 @@ function isRetweet(tweet){
 }
 
 function isMyTweet(tweet){
+    var bool = false;
     if(!tweet['retweeted_status'] && tweet['in_reply_to_screen_name'] == twitterConfig.screen_name){
         if (tweet['text'].slice(0, 1) != '@') {
-            return true;
+            bool = true;
         }
+    } else if (!tweet['retweeted_status'] && !tweet['in_reply_to_screen_name']){
+        bool = true;
     }
-    return false;
+    return bool;
 }
 
 function orderDates(files, from, to){
@@ -131,8 +138,11 @@ function getTweetsToAdd(files){
 }
 
 function previewTweets(tweets){
-    var discard = prompt("To confirm, hit 'enter'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
+    var discard = prompt("To confirm, respond 'y'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
     console.log(discard);
+    if (discard == 'y') {
+        return tweets
+    } 
     var strs = discard.split(',');
     var discarded = [];
     for (d in strs) {
@@ -145,7 +155,7 @@ function previewTweets(tweets){
         }
     }
     console.log("Tweets to be added after edits:", tweets);
-    var confirm = prompt("To add the tweets above, respond y. To remove more tweets, respond n. To cancel, respond c. => ")
+    var confirm = prompt("To add the tweets above, respond 'y'. To remove more tweets, respond 'n'. To cancel, respond 'c'. => ")
     if (confirm == 'y'){
         return tweets
     } else if (confirm == 'n') {
