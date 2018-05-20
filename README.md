@@ -12,7 +12,7 @@ Script to import tweets from Twitter to ssb, so that they will display in Patchw
     - `screen_name`: Your Twitter screen name -- the handle with "@" in front, but without the "@".
     - `retweets`: Set true to include retweets, false to not include.
     - `from`: The earliest [year, month] you want to start importing tweets from.
-    - `to`: The latest [year, month] you want to import tweets up to.
+    - `to`: The latest [year, month, day] you want to import tweets up to.
     - `dry_run`: Set true to only preview, and not add to ssb. Recommended for first run. Set false to actually import into ssb. You cannot delete tweets once added, so be sure to be certain before you actually add tweets. 
     
 5. Start [Patchwork](https://github.com/ssbc/patchwork) in another window. 
@@ -21,8 +21,3 @@ Script to import tweets from Twitter to ssb, so that they will display in Patchw
 
 
 **Warning:** This is a preliminary implementation, use at your own risk.
-
-### Todo: 
-
-- Index by date of individual tweet, not just files
-- CLI flags

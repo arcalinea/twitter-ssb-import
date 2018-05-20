@@ -4,8 +4,10 @@ var ssbConfig = require('ssb-config/inject')('ssb', {port: 8008})
 const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
-const twitterConfig = require('./config');
+var moment = require('moment');
 var prompt = require('prompt-sync')();
+
+const twitterConfig = require('./config');
 
 ssbConfig.keys = ssbKeys.loadOrCreateSync(path.join(ssbConfig.path, 'secret'))
 
@@ -45,10 +47,10 @@ ssbClient(
                 index = Object.keys(tweets)[Object.keys(tweets).length-1];
                 while (index > -1){
                     if (tweets[index]) {
-                        sbot.publish({type: "post", text: tweets[index]['text']}, function (err, msg) {
-                            if (err) throw err
-                            console.log("Published: ", msg)
-                        })
+                        // sbot.publish({type: "post", text: tweets[index]['text']}, function (err, msg) {
+                        //     if (err) throw err
+                        //     console.log("Published: ", msg)
+                        // })
                     }
                     index -= 1;
                 }
@@ -112,25 +114,30 @@ function getTweetsToAdd(files){
             var counter = 0;
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
-                var tweetStr = "[From Twitter](" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + "): " + tweet['text'];
-                //  Cases: retweets, own tweets, own replies
-                if(twitterConfig.retweets){
-                    //  include retweets
-                    if (isRetweet(tweet)) {
+                var tweetTime = Date.parse(tweet['created_at']);
+                var from = twitterConfig.from.join('-');
+                var to = twitterConfig.to.join('-');
+                if (moment(tweetTime) > moment(from) && moment(tweetTime) < moment(to)){
+                    var tweetStr = "[From Twitter](" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + "): " + tweet['text'];
+                    //  Cases: retweets, own tweets, own replies
+                    if(twitterConfig.retweets){
+                        //  include retweets
+                        if (isRetweet(tweet)) {
+                            var tweet = {};
+                            tweet['type'] = "retweet";
+                            tweet['text'] = tweetStr;
+                            tweetsToBeAdded[counter] = tweet;
+                            counter += 1;
+                        }
+                    }
+                    // Include my own tweets, regardless of config 
+                    if (isMyTweet(tweet)){
                         var tweet = {};
-                        tweet['type'] = "retweet";
+                        tweet['type'] = "my tweet";
                         tweet['text'] = tweetStr;
                         tweetsToBeAdded[counter] = tweet;
                         counter += 1;
                     }
-                }
-                // Include my own tweets, regardless of config 
-                if (isMyTweet(tweet)){
-                    var tweet = {};
-                    tweet['type'] = "my tweet";
-                    tweet['text'] = tweetStr;
-                    tweetsToBeAdded[counter] = tweet;
-                    counter += 1;
                 }
             }
         })

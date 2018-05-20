@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "fs": "0.0.1-security",
+    "moment": "^2.22.1",
     "prompt-sync": "^4.1.6",
     "scuttlebot": "^11.3.0"
   }
