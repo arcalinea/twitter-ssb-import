@@ -16,7 +16,7 @@ ssbConfig.remote = `net:127.0.0.1:${ssbConfig.port}~shs:${id.slice(1).replace('.
 
 console.log("Publishing to ID", id)
 
-var dataDir = "data";
+var dataDir = twitterConfig.data_dir;
 
 ssbClient(
   // ssbConfig.keys,                // optional, defaults to ~/.ssb/secret
