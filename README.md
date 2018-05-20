@@ -4,7 +4,7 @@ Script to import tweets from Twitter to ssb, so that they will display in Patchw
 
 1. Request your Twitter archive. You will be emailed a ZIP file.
 
-2. Unzip, and move the folder containing your tweets to this directory. They will be in `data/js/tweets`.
+2. Unzip, and move the folder containing your tweets to this directory. They will be in `data/js/tweets`. You should now have a directory called `data` here, with your tweet history here in files that look like `2018_02.js`.
 
 3. Run `npm install`.
 
