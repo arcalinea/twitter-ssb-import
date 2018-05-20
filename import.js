@@ -177,10 +177,8 @@ function orderTweetsByTime(tweets){
     for (var index in tweets) {
         ordered.push(tweets[index]);
     }
-    console.log("Unordered", ordered)
     ordered.sort(function(a, b) {
         return Date.parse(a.created_at) - Date.parse(b.created_at);
     });
-    console.log("Ordered", ordered)
     return ordered;
 }
