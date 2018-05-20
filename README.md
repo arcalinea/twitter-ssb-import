@@ -10,7 +10,6 @@ In `config.js` need to set screen_name to your Twitter handle, and whether retwe
 
 ## Todo: 
 
-- Make sure tweets are added in chronological order 
 - Make urls work/link mentioned users to Twitter profiles
 - Ability to preview before adding to ssb
 - CLI usage

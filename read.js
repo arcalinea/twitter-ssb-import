@@ -12,9 +12,13 @@ fs.readdir( dataDir, function( err, files ) {
             console.error( "Could not list the directory.", err );
             process.exit( 1 );
         } 
+        
+        var from = ['2018', '02'];
+        var to = ['2018', '03'];
+        var filesToBeAdded = orderDates(files, from, to);
 
         console.log("Include retweets:", twitterConfig.retweets)
-        files.forEach( function( file, index ) {
+        filesToBeAdded.forEach( function( file, index ) {
                 // parse each tweet file
                 var filePath = path.join( dataDir, file );
                 var tweetObj = parseTweets(filePath);
@@ -24,7 +28,7 @@ fs.readdir( dataDir, function( err, files ) {
                     if(twitterConfig.retweets){
                         //  include retweets
                         if (isRetweet(tweet)) {
-                            console.log("\nIncluding retweets");
+                            console.log("\nIncluding retweet");
                             console.log(tweet['text'])
                         }
                     }
@@ -51,6 +55,22 @@ function isMyTweet(tweet){
         }
     }
     return false;
+}
+
+function orderDates(files, from, to){
+    filesToBeAdded = []
+    for (i in files){
+        var file = files[i];
+        var fileDate = file.slice(0, -3).split('_');
+        var fromCutoff = parseInt(from[0]) + parseInt(from[1]);
+        var toCutoff = parseInt(to[0]) + parseInt(to[1]);
+        var fileDate = parseInt(fileDate[0]) + parseInt(fileDate[1]);
+        if (fromCutoff <= fileDate && fileDate <= toCutoff) {
+            filesToBeAdded.push(file);
+        }
+    }
+    console.log(filesToBeAdded);
+    return filesToBeAdded;
 }
 
 function parseTweets(filePath){
