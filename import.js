@@ -47,10 +47,10 @@ ssbClient(
                 index = Object.keys(tweets)[Object.keys(tweets).length-1];
                 while (index > -1){
                     if (tweets[index]) {
-                        // sbot.publish({type: "post", text: tweets[index]['text']}, function (err, msg) {
-                        //     if (err) throw err
-                        //     console.log("Published: ", msg)
-                        // })
+                        sbot.publish({type: "post", text: tweets[index]['text']}, function (err, msg) {
+                            if (err) throw err
+                            console.log("Published: ", msg)
+                        })
                     }
                     index -= 1;
                 }
@@ -107,17 +107,17 @@ function parseTweets(filePath){
 
 function getTweetsToAdd(files){
     var tweetsToBeAdded = {};
-    files.forEach( function( file, index ) {
+    var counter = 0;
+    for (index = 0; index < files.length; ++index) {
             // parse each tweet file
-            var filePath = path.join( dataDir, file );
+            var filePath = path.join( dataDir, files[index] );
             var tweetJSON = parseTweets(filePath);
-            var counter = 0;
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
-                var tweetTime = Date.parse(tweet['created_at']);
-                var from = twitterConfig.from.join('-');
-                var to = twitterConfig.to.join('-');
-                if (moment(tweetTime) > moment(from) && moment(tweetTime) < moment(to)){
+                var tweetTime = moment(Date.parse(tweet['created_at']));
+                var from = moment(twitterConfig.from.join('-'), "YYYY-MM-DD");
+                var to = moment(twitterConfig.to.join('-'), "YYYY-MM-DD");
+                if (tweetTime > from && tweetTime < to){
                     var tweetStr = "[From Twitter](" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + "): " + tweet['text'];
                     //  Cases: retweets, own tweets, own replies
                     if(twitterConfig.retweets){
@@ -140,16 +140,18 @@ function getTweetsToAdd(files){
                     }
                 }
             }
-        })
+        }
     return tweetsToBeAdded
 }
 
 function previewTweets(tweets){
-    var discard = prompt("To confirm, respond 'y'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
+    var discard = prompt("To confirm, respond 'y'. To cancel, respond 'n' or 'c'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
     console.log(discard);
     if (discard == 'y') {
         return tweets
-    } 
+    } else if (discard == 'n' || discard == 'c'){
+        process.exit( 1 );
+    }
     var strs = discard.split(',');
     var discarded = [];
     for (d in strs) {
