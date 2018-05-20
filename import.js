@@ -35,13 +35,11 @@ ssbClient(
                 process.exit( 1 );
             } 
             
-            var filesToBeAdded = orderDates(files, twitterConfig.from, twitterConfig.to);
-
-            console.log("Include retweets:", twitterConfig.retweets);
+            var filesToBeAdded = getFilesToAdd(files);
             var tweetsToBeAdded = getTweetsToAdd(filesToBeAdded);
-            console.log(tweetsToBeAdded);
+            var previewedTweets = previewTweets(tweetsToBeAdded);
+            var tweets = orderTweetsByTime(previewedTweets);
             
-            var tweets = previewTweets(tweetsToBeAdded);
             if(!twitterConfig.dry_run){
                 console.log("Publishing tweets to ssb...");
                 index = Object.keys(tweets)[Object.keys(tweets).length-1];
@@ -82,7 +80,9 @@ function isMyTweet(tweet){
     return bool;
 }
 
-function orderDates(files, from, to){
+function getFilesToAdd(files){
+    var from = twitterConfig.from;
+    var to = twitterConfig.to;
     filesToBeAdded = []
     for (i in files){
         var file = files[i];
@@ -112,6 +112,7 @@ function getTweetsToAdd(files){
             // parse each tweet file
             var filePath = path.join( dataDir, files[index] );
             var tweetJSON = parseTweets(filePath);
+            var tTime = moment('1999-03-28', "YYYY-MM-DD");
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
                 var tweetTime = moment(Date.parse(tweet['created_at']));
@@ -119,23 +120,21 @@ function getTweetsToAdd(files){
                 var to = moment(twitterConfig.to.join('-'), "YYYY-MM-DD");
                 if (tweetTime > from && tweetTime < to){
                     var tweetStr = "[From Twitter](" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + "): " + tweet['text'];
-                    //  Cases: retweets, own tweets, own replies
+                    var tweetObj = {
+                        'text': tweetStr,
+                        'created_at': tweet['created_at']
+                    };
                     if(twitterConfig.retweets){
-                        //  include retweets
                         if (isRetweet(tweet)) {
-                            var tweet = {};
-                            tweet['type'] = "retweet";
-                            tweet['text'] = tweetStr;
-                            tweetsToBeAdded[counter] = tweet;
+                            tweetObj['type'] = "retweet";
+                            tweetsToBeAdded[counter] = tweetObj;
                             counter += 1;
                         }
                     }
                     // Include my own tweets, regardless of config 
                     if (isMyTweet(tweet)){
-                        var tweet = {};
-                        tweet['type'] = "my tweet";
-                        tweet['text'] = tweetStr;
-                        tweetsToBeAdded[counter] = tweet;
+                        tweetObj['type'] = "my tweet";
+                        tweetsToBeAdded[counter] = tweetObj;
                         counter += 1;
                     }
                 }
@@ -145,6 +144,7 @@ function getTweetsToAdd(files){
 }
 
 function previewTweets(tweets){
+    console.log(tweets)
     var discard = prompt("To confirm, respond 'y'. To cancel, respond 'n' or 'c'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
     console.log(discard);
     if (discard == 'y') {
