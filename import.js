@@ -5,7 +5,7 @@ const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
 const twitterConfig = require('./config');
-var Input = require('prompt-input');
+var prompt = require('prompt-sync')();
 
 ssbConfig.keys = ssbKeys.loadOrCreateSync(path.join(ssbConfig.path, 'secret'))
 
@@ -40,13 +40,14 @@ ssbClient(
             var tweetsToBeAdded = getTweetsToAdd(filesToBeAdded);
             console.log(tweetsToBeAdded);
             
-
-            
             var tweets = previewTweets(tweetsToBeAdded);
-            // sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
-            //     if (err) throw err
-            //     console.log("Published", tweet['text'])
-            // })
+            if(!twitterConfig.dry_run){
+                console.log("PUBLISHING")
+                // sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
+                //     if (err) throw err
+                //     console.log("Published", tweet['text'])
+                // })
+            }
             
             sbot.close()
     })
@@ -127,24 +128,26 @@ function getTweetsToAdd(files){
 }
 
 function previewTweets(tweets){
-    var preview = new Input({
-      name: 'preview',
-      message: "\nLook over the tweets above, and enter the numerical ids of tweets NOT to add, separated by commas:"
-    });
-    
-    preview.ask(function(discard) {
-        console.log(discard);
-        var strs = discard.split(',');
-        var discarded = [];
-        for (d in strs) {
-            discarded.push(parseInt(strs[d]));
+    var discard = prompt("Look over the tweets above, and enter the numerical ids of tweets NOT to add, separated by commas => ");
+    console.log(discard);
+    var strs = discard.split(',');
+    var discarded = [];
+    for (d in strs) {
+        discarded.push(parseInt(strs[d]));
+    }
+    console.log("Discarded", discarded);
+    for (var key in tweets) {
+        if (discarded.includes(parseInt(key))){
+            delete tweets[key];
         }
-        console.log("Discarded", discarded);
-        for (var key in tweets) {
-            if (discarded.includes(parseInt(key))){
-                delete tweets[key];
-            }
-        }
-        console.log("Tweets to be added after edits:", tweets)
-    });
+    }
+    console.log("Tweets to be added after edits:", tweets);
+    var confirm = prompt("To add the tweets above, respond y. To remove more tweets, respond n. To cancel, respond c. => ")
+    if (confirm == 'y'){
+        return tweets
+    } else if (confirm == 'n') {
+        previewTweets(tweets);
+    } else {
+        process.exit( 1 );
+    }
 }
