@@ -1,6 +1,6 @@
 // config.js
 const twitterConfig = {
-    retweets: false,
+    retweets: true,
     screen_name: 'arcalinea',
     from: ['2018', '02'],
     to: ['2018', '03']

@@ -5,6 +5,7 @@ const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
 const twitterConfig = require('./config');
+var Input = require('prompt-input');
 
 ssbConfig.keys = ssbKeys.loadOrCreateSync(path.join(ssbConfig.path, 'secret'))
 
@@ -25,10 +26,6 @@ ssbClient(
   },
   function (err, sbot, config) {
     if (err) throw(err)
-    sbot.whoami(function (err, info) {
-        if (err) throw err
-        console.log('whoami', info)
-    })
     
     // Loop through all the files in the data directory
     fs.readdir( dataDir, function( err, files ) {
@@ -36,38 +33,25 @@ ssbClient(
                 console.error( "Could not list the directory.", err );
                 process.exit( 1 );
             } 
+            
+            var filesToBeAdded = orderDates(files, twitterConfig.from, twitterConfig.to);
 
-            files.forEach( function( file, index ) {
-                    // parse each tweet file
-                    var filePath = path.join( dataDir, file );
-                    var allTweetData = parseTweetData(filePath);
-                    for (var t in allTweetData){
-                        var tweet = allTweetData[t];
-                        //  Cases: retweets, own tweets, own replies
-                        if(twitterConfig.retweets){
-                            //  include retweets
-                            if (isRetweet(tweet)) {
-                                console.log("\nIncluding retweet");
-                                sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
-                                    if (err) throw err
-                                    console.log("Published", tweet['text'])
-                                })
-                            }
-                        }
-                        // Include my own tweets, regardless of config 
-                        if (isMyTweet(tweet)){
-                            console.log("\nIncluding my own tweet")
-                            sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
-                                if (err) throw err
-                                console.log("Published", tweet['text'])
-                            })
-                        }
-                    }
-                    sbot.close()
-                })
-            })
-    }
-)
+            console.log("Include retweets:", twitterConfig.retweets);
+            var tweetsToBeAdded = getTweetsToAdd(filesToBeAdded);
+            console.log(tweetsToBeAdded);
+            
+
+            
+            var tweets = previewTweets(tweetsToBeAdded);
+            // sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
+            //     if (err) throw err
+            //     console.log("Published", tweet['text'])
+            // })
+            
+            sbot.close()
+    })
+})
+
 
 function isRetweet(tweet){
     if(tweet['retweeted_status']){
@@ -85,9 +69,82 @@ function isMyTweet(tweet){
     return false;
 }
 
-function parseTweetData(filePath){
+function orderDates(files, from, to){
+    filesToBeAdded = []
+    for (i in files){
+        var file = files[i];
+        var fileDate = file.slice(0, -3).split('_');
+        var fromCutoff = parseInt(from[0]) + parseInt(from[1]);
+        var toCutoff = parseInt(to[0]) + parseInt(to[1]);
+        var fileDate = parseInt(fileDate[0]) + parseInt(fileDate[1]);
+        if (fromCutoff <= fileDate && fileDate <= toCutoff) {
+            filesToBeAdded.push(file);
+        }
+    }
+    console.log(filesToBeAdded);
+    return filesToBeAdded;
+}
+
+function parseTweets(filePath){
     var data = fs.readFileSync(filePath, 'utf8');
     var jsonData = data.split('\n').slice(1).join('\n');
-    var allTweetData = JSON.parse(jsonData);
-    return allTweetData;
+    var tweetJSON = JSON.parse(jsonData);
+    return tweetJSON
+}
+
+function getTweetsToAdd(files){
+    var tweetsToBeAdded = {};
+    files.forEach( function( file, index ) {
+            // parse each tweet file
+            var filePath = path.join( dataDir, file );
+            var tweetJSON = parseTweets(filePath);
+            var counter = 0;
+            for (var t in tweetJSON){
+                var tweet = tweetJSON[t];
+                var tweetStr = "[From Twitter]: (" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + ") " + tweet['text'];
+                //  Cases: retweets, own tweets, own replies
+                if(twitterConfig.retweets){
+                    //  include retweets
+                    if (isRetweet(tweet)) {
+                        var tweet = {};
+                        tweet['type'] = "retweet";
+                        tweet['text'] = tweetStr;
+                        tweetsToBeAdded[counter] = tweet;
+                        counter += 1;
+                    }
+                }
+                // Include my own tweets, regardless of config 
+                if (isMyTweet(tweet)){
+                    var tweet = {};
+                    tweet['type'] = "my tweet";
+                    tweet['text'] = tweetStr;
+                    tweetsToBeAdded[counter] = tweet;
+                    counter += 1;
+                }
+            }
+        })
+    return tweetsToBeAdded
+}
+
+function previewTweets(tweets){
+    var preview = new Input({
+      name: 'preview',
+      message: "\nLook over the tweets above, and enter the numerical ids of tweets NOT to add, separated by commas:"
+    });
+    
+    preview.ask(function(discard) {
+        console.log(discard);
+        var strs = discard.split(',');
+        var discarded = [];
+        for (d in strs) {
+            discarded.push(parseInt(strs[d]));
+        }
+        console.log("Discarded", discarded);
+        for (var key in tweets) {
+            if (discarded.includes(parseInt(key))){
+                delete tweets[key];
+            }
+        }
+        console.log("Tweets to be added after edits:", tweets)
+    });
 }
