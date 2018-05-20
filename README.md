@@ -15,13 +15,14 @@ Script to import tweets from Twitter to ssb, so that they will display in Patchw
     - `to`: The latest [year, month] you want to import tweets up to.
     - `dry_run`: Set true to only preview, and not add to ssb. Recommended for first run. Set false to actually import into ssb. You cannot delete tweets once added, so be sure to be certain before you actually add tweets. 
     
-5. Start Patchwork in another window. 
+5. Start [Patchwork](https://github.com/ssbc/patchwork) in another window. 
 
-6. Run `node import.js` to run import script. You will be prompted to preview the tweets being added, and delete ones you do not want. 
+6. Run `node import.js` to run import script. You will be prompted to preview the tweets being added, and delete ones you do not want imported. 
 
 
-**Warning:** This is a preliminary implementation. 
+**Warning:** This is a preliminary implementation, use at your own risk.
 
 ### Todo: 
 
 - Index by date of individual tweet, not just files
+- CLI flags
