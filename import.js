@@ -45,7 +45,7 @@ ssbClient(
                 for (k in tweets){
                     sbot.publish({type: "post", text: tweets[k]['text']}, function (err, msg) {
                         if (err) throw err
-                        console.log("Published: ", tweet['text'])
+                        console.log("Published: ", tweets[k]['text'])
                     })
                 }
             } else {
@@ -105,7 +105,7 @@ function getTweetsToAdd(files){
             var counter = 0;
             for (var t in tweetJSON){
                 var tweet = tweetJSON[t];
-                var tweetStr = "[From Twitter]: (" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + ") " + tweet['text'];
+                var tweetStr = "[From Twitter](" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + "): " + tweet['text'];
                 //  Cases: retweets, own tweets, own replies
                 if(twitterConfig.retweets){
                     //  include retweets
