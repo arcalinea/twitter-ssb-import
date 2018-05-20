@@ -10,7 +10,5 @@ In `config.js` need to set screen_name to your Twitter handle, and whether retwe
 
 ## Todo: 
 
-- Make urls work/link mentioned users to Twitter profiles
 - Ability to preview before adding to ssb
 - CLI usage
-- Ability to specify date range
