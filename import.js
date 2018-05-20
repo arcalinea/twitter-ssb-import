@@ -43,11 +43,13 @@ ssbClient(
             if(!twitterConfig.dry_run){
                 console.log("Publishing tweets to ssb...");
                 for (k in tweets){
-                    // sbot.publish({type: "post", text: tweets[k]['text']}, function (err, msg) {
-                    //     if (err) throw err
-                    //     console.log("Published: ", tweet['text'])
-                    // })
+                    sbot.publish({type: "post", text: tweets[k]['text']}, function (err, msg) {
+                        if (err) throw err
+                        console.log("Published: ", tweet['text'])
+                    })
                 }
+            } else {
+                console.log("Finished preview. To add tweets to ssb, change 'dry_run' field in config.js to 'false'.")
             }
             
             sbot.close()
@@ -129,7 +131,7 @@ function getTweetsToAdd(files){
 }
 
 function previewTweets(tweets){
-    var discard = prompt("Look over the tweets above, and enter the numerical ids of tweets NOT to add, separated by commas => ");
+    var discard = prompt("To confirm, hit 'enter'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
     console.log(discard);
     var strs = discard.split(',');
     var discarded = [];
