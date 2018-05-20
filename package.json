@@ -2,11 +2,12 @@
   "name": "ssb-twitter-import",
   "version": "1.0.0",
   "description": "Imports tweets to ssb",
-  "main": "index.js",
+  "repository": "git@github.com/arcalinea/twitter-ssb-import",
+  "main": "import.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "arcalinea",
   "license": "ISC",
   "dependencies": {
     "fs": "0.0.1-security",
