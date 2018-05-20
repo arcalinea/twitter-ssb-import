@@ -148,7 +148,7 @@ function previewTweets(tweets){
     if (discard == 'y') {
         return tweets
     } else if (discard == 'n' || discard == 'c'){
-        process.exit( 1 );
+        process.exit( 0 );
     }
     var strs = discard.split(',');
     var discarded = [];
@@ -168,7 +168,8 @@ function previewTweets(tweets){
     } else if (confirm == 'n') {
         previewTweets(tweets);
     } else {
-        process.exit( 1 );
+        console.log("Please respond with 'y', 'n', or 'c'")
+        process.exit( 0 );
     }
 }
 
