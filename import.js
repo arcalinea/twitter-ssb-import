@@ -14,7 +14,6 @@ ssbConfig.remote = `net:127.0.0.1:${ssbConfig.port}~shs:${id.slice(1).replace('.
 
 console.log("Publishing to ID", id)
 
-// var filename = 'data/2018_05.js';
 var dataDir = "data";
 
 ssbClient(
@@ -42,11 +41,13 @@ ssbClient(
             
             var tweets = previewTweets(tweetsToBeAdded);
             if(!twitterConfig.dry_run){
-                console.log("PUBLISHING")
-                // sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
-                //     if (err) throw err
-                //     console.log("Published", tweet['text'])
-                // })
+                console.log("Publishing tweets to ssb...");
+                for (k in tweets){
+                    // sbot.publish({type: "post", text: tweets[k]['text']}, function (err, msg) {
+                    //     if (err) throw err
+                    //     console.log("Published: ", tweet['text'])
+                    // })
+                }
             }
             
             sbot.close()
