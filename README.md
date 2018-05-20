@@ -6,9 +6,8 @@ You must request your Twitter archive and place the tweet data folder in this di
 
 In `config.js` need to set screen_name to your Twitter handle, and whether retweets will be included.
 
-**Warning:** This is a preliminary implementation. Many things left to do to make it actually useful. 
+**Warning:** This is a preliminary implementation. 
 
 ## Todo: 
 
-- Ability to preview before adding to ssb
 - CLI usage
