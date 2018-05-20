@@ -18,7 +18,7 @@ Script to import tweets from Twitter to ssb, so that they will display in Patchw
 
 5. Start [Patchwork](https://github.com/ssbc/patchwork) in another window. 
 
-6. Run `node import.js` to run import script. You will be prompted to preview the tweets being added, and delete ones you do not want imported. Tweets will be chronologically sorted, and posted from earliest to latest. 
+6. Run `npm start`. You will be prompted to preview the tweets being added, and delete ones you do not want imported. Tweets will be chronologically sorted, and posted from earliest to latest. 
 
 
 **Warning:** This is a preliminary implementation, use at your own risk.
