@@ -92,7 +92,7 @@ function getFilesToAdd(files){
             filesToBeAdded.push(file);
         }
     }
-    console.log(filesToBeAdded);
+    console.log("\nFiles to be added:\n", filesToBeAdded);
     return filesToBeAdded;
 }
 
@@ -142,7 +142,7 @@ function getTweetsToAdd(files){
 }
 
 function previewTweets(tweets){
-    console.log(tweets)
+    console.log("\nPreview tweets:\n", tweets)
     var discard = prompt("To confirm, respond 'y'. To cancel, respond 'n' or 'c'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
     console.log(discard);
     if (discard == 'y') {
