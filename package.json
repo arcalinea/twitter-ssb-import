@@ -1,5 +1,5 @@
 {
-  "name": "ssb-twitter-import",
+  "name": "twitter-ssb-import",
   "version": "1.0.0",
   "description": "Imports tweets to ssb",
   "repository": "git@github.com/arcalinea/twitter-ssb-import",
