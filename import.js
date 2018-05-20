@@ -41,18 +41,49 @@ ssbClient(
                     // parse each tweet file
                     var filePath = path.join( dataDir, file );
                     var allTweetData = parseTweetData(filePath);
-                    for (var i in allTweetData){
-                        var msg = allTweetData[i]['text'];
-                        sbot.publish({type: "post", text: msg}, function (err, msg) {
-                            if (err) throw err
-                            console.log("Published", msg)
-                        })
+                    for (var t in allTweetData){
+                        var tweet = allTweetData[t];
+                        //  Cases: retweets, own tweets, own replies
+                        if(twitterConfig.retweets){
+                            //  include retweets
+                            if (isRetweet(tweet)) {
+                                console.log("\nIncluding retweet");
+                                sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
+                                    if (err) throw err
+                                    console.log("Published", tweet['text'])
+                                })
+                            }
+                        }
+                        // Include my own tweets, regardless of config 
+                        if (isMyTweet(tweet)){
+                            console.log("\nIncluding my own tweet")
+                            sbot.publish({type: "post", text: tweet['text']}, function (err, msg) {
+                                if (err) throw err
+                                console.log("Published", tweet['text'])
+                            })
+                        }
                     }
                     sbot.close()
                 })
             })
     }
 )
+
+function isRetweet(tweet){
+    if(tweet['retweeted_status']){
+        return true;
+    }
+    return false;
+}
+
+function isMyTweet(tweet){
+    if(!tweet['retweeted_status'] && tweet['in_reply_to_screen_name'] == twitterConfig.screen_name){
+        if (tweet['text'].slice(0, 1) != '@') {
+            return true;
+        }
+    }
+    return false;
+}
 
 function parseTweetData(filePath){
     var data = fs.readFileSync(filePath, 'utf8');
