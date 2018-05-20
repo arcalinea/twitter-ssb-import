@@ -21,3 +21,7 @@ Script to import tweets from Twitter to ssb, so that they will display in Patchw
 
 
 **Warning:** This is a preliminary implementation. 
+
+### Todo: 
+
+- Index by date of individual tweet, not just files
