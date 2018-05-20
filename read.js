@@ -13,9 +13,7 @@ fs.readdir( dataDir, function( err, files ) {
             process.exit( 1 );
         } 
         
-        var from = ['2018', '02'];
-        var to = ['2018', '03'];
-        var filesToBeAdded = orderDates(files, from, to);
+        var filesToBeAdded = orderDates(files, twitterConfig.from, twitterConfig.to);
 
         console.log("Include retweets:", twitterConfig.retweets)
         filesToBeAdded.forEach( function( file, index ) {
@@ -24,18 +22,19 @@ fs.readdir( dataDir, function( err, files ) {
                 var tweetObj = parseTweets(filePath);
                 for (var t in tweetObj){
                     var tweet = tweetObj[t];
+                    var tweetStr = "[From Twitter]: (" + "https://twitter.com/" + twitterConfig.screen_name + "/status/" + tweet['id_str'] + ") " + tweet['text'];
                     //  Cases: retweets, own tweets, own replies
                     if(twitterConfig.retweets){
                         //  include retweets
                         if (isRetweet(tweet)) {
                             console.log("\nIncluding retweet");
-                            console.log(tweet['text'])
+                            console.log(tweetStr);
                         }
                     }
                     // Include my own tweets, regardless of config 
                     if (isMyTweet(tweet)){
                         console.log("\nIncluding my own tweet")
-                        console.log(tweet['text'])
+                        console.log(tweetStr);
                     }
                 }
             })
