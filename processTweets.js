@@ -6,7 +6,8 @@ var prompt = require('prompt-sync')();
 
 const twitterConfig = require('./config');
 
-var processTweets = function(files) {
+var processTweets = function(dataDir) {
+    var files = fs.readdirSync(dataDir);
     var filesToBeAdded = getFilesToAdd(files);
     var tweetsToBeAdded = getTweetsToAdd(filesToBeAdded);
     var previewedTweets = previewTweets(tweetsToBeAdded);

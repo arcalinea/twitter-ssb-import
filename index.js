@@ -17,9 +17,6 @@ ssbConfig.remote = `net:127.0.0.1:${ssbConfig.port}~shs:${id.slice(1).replace('.
 
 console.log("Publishing to ID", id)
 
-var dataDir = twitterConfig.data_dir;
-
-
 ssbClient(
   // ssbConfig.keys,                // optional, defaults to ~/.ssb/secret
   {
@@ -29,30 +26,22 @@ ssbClient(
   },
   function (err, sbot, config) {
     if (err) throw(err)
+                
+    var tweets = processTweets(twitterConfig.data_dir);
     
-    // Loop through all the files in the data directory
-    fs.readdir( dataDir, function( err, files ) {
-            if( err ) {
-                console.error( "Could not list the directory.", err );
-                process.exit( 1 );
-            } 
-            
-            var tweets = processTweets(files);
-            
-            if(!twitterConfig.dry_run){
-                console.log("Publishing tweets to ssb...");
-                for (i = 0; i < tweets.length; ++i) {
-                    console.log(tweets[i]['text'])
-                    sbot.publish({type: "post", text: tweets[i]['text']}, function (err, msg) {
-                        if (err) throw err
-                        console.log("Published: ", msg)
-                    })
-                    index -= 1;
-                }
-            } else {
-                console.log("Finished preview. To add tweets to ssb, change 'dry_run' field in config.js to 'false'.")
-            }
-            
-            sbot.close()
-    })
-})
+    if(!twitterConfig.dry_run){
+        console.log("Publishing tweets to ssb...");
+        for (i = 0; i < tweets.length; ++i) {
+            console.log(tweets[i]['text'])
+            sbot.publish({type: "post", text: tweets[i]['text']}, function (err, msg) {
+                if (err) throw err
+                console.log("Published: ", msg)
+            })
+            index -= 1;
+        }
+    } else {
+        console.log("Finished preview. To add tweets to ssb, change 'dry_run' field in config.js to 'false'.")
+    }
+    
+    sbot.close()
+   })
