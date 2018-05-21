@@ -20,5 +20,10 @@ Script to import tweets from Twitter to ssb, so that they will display in Patchw
 
 6. Run `npm start`. You will be prompted to preview the tweets being added, and delete ones you do not want imported. Tweets will be chronologically sorted, and posted from earliest to latest. 
 
+Your tweets will be imported as ssb posts, with the words "From Twitter:" linked to the original tweet:
+
+[From Twitter](https://twitter.com/arcalinea/status/998238722880557057): Wrote a script to import your past tweets to #scuttlebutt, so they'll appear in Patchwork! Just download the zip file of your tweets and follow instructions. More centralized-to-decentralized social integration.
+
+
 
 **Warning:** This is a preliminary implementation, use at your own risk.
