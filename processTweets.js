@@ -99,7 +99,7 @@ function getTweetsToAdd(files){
     return tweetsToBeAdded
 }
 
-function previewTweets(tweets){
+var previewTweets = function preview(tweets){
     console.log("\nPreview tweets:\n", tweets)
     var discard = prompt("To confirm, respond 'y'. To cancel, respond 'n' or 'c'. To NOT add any of the tweets above, enter their numerical IDs, separated by commas => ");
     console.log(discard);
@@ -124,7 +124,7 @@ function previewTweets(tweets){
     if (confirm == 'y'){
         return tweets
     } else if (confirm == 'n') {
-        previewTweets(tweets);
+        return preview(tweets);
     } else {
         console.log("Please respond with 'y', 'n', or 'c'")
         process.exit( 0 );
